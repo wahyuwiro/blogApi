@@ -1,0 +1,52 @@
+{
+  "name": "blog-api-service",
+  "version": "1.0.0",
+  "description": "Service of all source request",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "npm install",
+    "start": "nodemon node index.js"
+  },
+  "keywords": [
+    "swagger"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wahyuwiro/blogApi.git"
+  },
+  "author": "wahyu",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wahyuwiro/blogApi/issues"
+  },
+  "homepage": "https://github.com/wahyuwiro/blogApi#readme",
+  "dependencies": {
+    "argon2": "^0.28.5",
+    "aws-sdk": "^2.908.0",
+    "body-parser": "^1.19.0",
+    "buffer-image": "^1.0.0",
+    "connect": "^3.2.0",
+    "crypto": "^1.0.1",
+    "cryptr": "^6.0.2",
+    "ddos": "^0.2.1",
+    "dotenv": "^8.2.0",
+    "excel4node": "^1.7.2",
+    "express": "^4.17.1",
+    "form-data": "^3.0.0",
+    "helmet": "^4.6.0",
+    "js-yaml": "^3.14.0",
+    "jsonwebtoken": "^8.5.1",
+    "md5": "^2.3.0",
+    "moment": "^2.29.1",
+    "mongoose": "^5.12.14",
+    "node-minify": "^3.6.0",
+    "node-rsa": "^1.1.1",
+    "nodemon": "^2.0.4",
+    "npm": "^7.21.1",
+    "pg": "^8.5.1",
+    "request": "^2.88.0",
+    "restana": "^4.7.2",
+    "swagger-tools": "^0.10.4"
+  }
+}
