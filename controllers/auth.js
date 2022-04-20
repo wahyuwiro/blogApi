@@ -35,17 +35,6 @@ module.exports.loginAccount = async function loginAccount(req, res) {
     utils.writeJson(res, response);
 }
 
-module.exports.getAccount = async function getAccount(req, res) {
-    var appSignature = req.swagger.params['appSignature'].value;
-    var param = req.swagger.params['param'].value;
-    var body = {};
-    body.appSignature = appSignature;
-    body.param = JSON.parse(param);
-    console.log('body=>',body)
-    let response = await authService.getAccount(body);
-    console.log('RESPONSE LOGIN ACCOUNT ===> ', response)
-    utils.writeJson(res, response);
-}
 module.exports.logoutAccount = async function logoutAccount(req, res) {
     var token = req.swagger.params['token'].value;
     let body = {};

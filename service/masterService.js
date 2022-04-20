@@ -3,8 +3,7 @@ const request = require('request');
 var mongoose = require('mongoose').set('debug', true);
 var mongo = require('../config/mongo');
 var accountSchema = require('../config/accountSchema');
-var authService = require('../service/authService');
-var masterService = require('../service/masterService');
+var blogSchema = require('../config/blogSchema');
 // const pgCon = require('../config/pgConfig');
 let message = {};
 const fs = require('fs');
@@ -97,13 +96,13 @@ exports.updateProfile = function (data) {
                 })
                 return;
             }
-            if (data.phone && !data.phoneCode || data.phoneCode && !data.phone) {
-                resolve({
-                    responseCode: process.env.NOTACCEPT_RESPONSE,
-                    responseMessage: "Phone and code required"
-                })
-                return;
-            }
+            // if (data.phone && !data.phoneCode || data.phoneCode && !data.phone) {
+            //     resolve({
+            //         responseCode: process.env.NOTACCEPT_RESPONSE,
+            //         responseMessage: "Phone and code required"
+            //     })
+            //     return;
+            // }
 
             let change = '';
             if (data.fullname) {
@@ -360,4 +359,118 @@ function extend(target) {
       }
     });
     return target;
+}
+
+exports.insertBlog = function (data) {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let ib = await insertBlog(data);
+            resolve(ib);
+        } catch (e) {
+            console.log('Error insertBlog => ', e)
+            message = {
+                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
+                "responseMessage": "Internal server error. Try again later!"
+            }
+            resolve(message);
+        }
+    })
+}
+
+function insertBlog(data) {
+    console.log('insertBlog data =>',data)
+    return new Promise(async function (resolve, reject) {
+        var res = {};
+        try {
+            var priorDate = new Date();
+            var expDay = priorDate.getDate();
+            var expMonth = priorDate.getMonth() + 1;
+            var expYear = priorDate.getFullYear();
+            let tmpMonth = ("0" + expMonth).slice(-2); //convert bulan supaya selalu 2 digits
+            let tmpDate = ("0" + expDay).slice(-2); //convert hari supaya selalu 2 digits
+            var convertDate = expYear + "-" + tmpMonth + "-" + tmpDate;
+            await mongoose.connect(mongo.mongoDb.url, {
+                useNewUrlParser: true
+            });
+            
+            var newBlog = new blogSchema({
+                title: data.title,
+                content: data.content,
+                phone: data.phone,
+                createdUser: data.profile.id,
+                createdAt: convertDate
+            });
+            var saveBlog = await newBlog.save();
+            console.log('saveBlog ==> ', saveBlog)
+            await mongoose.connection.close();
+            if (saveBlog) {
+                res.responseCode= process.env.SUCCESS_RESPONSE,
+                res.responseMessage= 'Success'
+            } else {
+                res.responseCode= process.env.NOTACCEPT_RESPONSE,
+                res.responseMessage= 'Failed'
+            }           
+            resolve(res);
+        } catch (e) {
+            console.log('Error save blog ==> ', e);
+            res.responseCode = process.env.ERRORINTERNAL_RESPONSE,
+            res.responseMessage = 'Internal server error, please try again!'
+            resolve(res);
+        }
+    })
+}
+
+exports.getBlog = function (data) {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let ib = await getBlog(data);
+            resolve(ib);
+        } catch (e) {
+            console.log('Error getBlog => ', e)
+            message = {
+                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
+                "responseMessage": "Internal server error. Try again later!"
+            }
+            resolve(message);
+        }
+    })
+}
+
+function getBlog(data) {
+    console.log('getBlog data =>',data)
+    return new Promise(async function (resolve, reject) {
+        var res = {}, pId = {}, pUser = {};
+        try {
+            pUser = {
+                'createdUser': data.profile.id
+            }
+            if (data.id) {
+                pId = {
+                  '_id': data.id
+                }
+            }
+            var param = extend({}, pId, pUser);
+            await mongoose.connect(mongo.mongoDb.url, {
+                useNewUrlParser: true
+            });
+            let query = await blogSchema.find(param).sort({'createdDate': -1}).populate('createdUser','fullname');
+            console.log('query ==> ', query)
+            await mongoose.connection.close();
+            if (query === null || query.length == 0) {
+                res.responseCode = process.env.NOTFOUND_RESPONSE;
+                res.responseMessage = "Not found"
+            } else {
+                res.responseCode = process.env.SUCCESS_RESPONSE;
+                res.responseMessage = "Success";
+                res.data = query
+            }    
+            
+            resolve(res);
+        } catch (e) {
+            console.log('Error get blog ==> ', e);
+            res.responseCode = process.env.ERRORINTERNAL_RESPONSE,
+            res.responseMessage = 'Internal server error, please try again!'
+            resolve(res);
+        }
+    })
 }

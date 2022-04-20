@@ -3,24 +3,22 @@
 var utils = require('../utils/writer.js');
 // const pgCon = require('../config/pgConfig');
 var isValid = '';
-const check = require('../controllers/check');
-const masterService = require('../service/masterService');
-const checking = require('../controllers/check');
-const Cryptr = require('cryptr');
-const fs = require('fs');
-// let decode = require('im-decode');
-const bufferImage = require("buffer-image");
+const master = require('../service/masterService');
+const auth = require('../service/authService');
 var log={}
 
 module.exports.getProfile = async function getProfile(req, res) {
     var token = req.swagger.params['token'].value;
     var signature = req.swagger.params['signature'].value;
-    var param = req.swagger.params['param'].value;
-    let body = {};
     // check token 
-    let response = await masterService.getProfile(param);
-    console.log('getProfile response =>',response)
-    utils.writeJson(res, response);
+    let ct = await auth.checkToken(token);
+    if (ct.responseCode == process.env.SUCCESS_RESPONSE) {
+        var data = JSON.stringify(ct.data);
+        let response = await master.getProfile(data);
+        utils.writeJson(res, response);
+    } else {
+        utils.writeJson(res, ct);
+    }    
 }
 module.exports.updateProfile = async function updateProfile(req, res) {
     var token = req.swagger.params['token'].value;
@@ -30,7 +28,40 @@ module.exports.updateProfile = async function updateProfile(req, res) {
     if (req.swagger.params['deviceId'].value) {
         body.deviceId = req.swagger.params['deviceId'].value;
     }
-    let response = await masterService.updateProfile(body);
+    let response = await master.updateProfile(body);
     utils.writeJson(res, response);
 
+}
+
+module.exports.insertBlog = async function insertBlog(req, res) {
+    var token = req.swagger.params['token'].value;
+    var body = req.swagger.params['body'].value;
+    // check token 
+    let ct = await auth.checkToken(token);
+    if (ct.responseCode == process.env.SUCCESS_RESPONSE) {
+        // var data = JSON.stringify(ct.data);
+        body.profile = ct.data;
+        let response = await master.insertBlog(body);
+        utils.writeJson(res, response);
+    } else {
+        utils.writeJson(res, ct);
+    }    
+}
+
+module.exports.getBlog = async function getBlog(req, res) {
+    var token = req.swagger.params['token'].value;
+    var param = req.swagger.params['param'].value;
+    if(!param) { param = {}
+    }else{ param = JSON.parse(param)
+    }
+    // check token 
+    let ct = await auth.checkToken(token);
+    if (ct.responseCode == process.env.SUCCESS_RESPONSE) {
+        // var data = JSON.stringify(ct.data);
+        param.profile = ct.data;
+        let response = await master.getBlog(param);
+        utils.writeJson(res, response);
+    } else {
+        utils.writeJson(res, ct);
+    }    
 }

@@ -37,9 +37,7 @@ function registerAccount(data) {
                 phone: data.phone,
                 password: password,
                 originPassword: data.password,
-                language: 'en',
-                createdAt: convertDate,
-                createdTime: dateObj,
+                createdAt: convertDate
             });
             var saveAcc = await newAccount.save();
             console.log('saveAcc ==> ', saveAcc)
@@ -156,46 +154,6 @@ exports.registerAccount = function (body) {
         }
     })
 }
-async function getProfileAccount(data) {
-    try {
-        // open connection for find data by phone in ultipage
-        let where = {};
-        if (data.phone && data.phoneCode) {
-            where.phone = data.phone;
-            where.phoneCode = data.phoneCode;
-        }
-        if (data.merchantId) {
-            where.merchantId = data.merchantId;
-        }
-
-        mongoose.Promise = global.Promise;
-        await mongoose.connect(mongo.mongoDb.url, {
-            useNewUrlParser: true
-        });
-        let query = await accountSchema.findOne(where);
-        await mongoose.connection.close();
-        // close connection for find data by phone in ultipage
-        if (query === null) {
-            return ({
-                responseCode: process.env.NOTFOUND_RESPONSE,
-                responseMessage: "Not found"
-            })
-        } else {
-            return ({
-                responseCode: process.env.SUCCESS_RESPONSE,
-                responseMessage: "Success",
-                data: query
-            })
-        }
-    } catch (e) {
-        console.log('Error get profile merchant ==> ', e);
-        return ({
-            responseCode: process.env.ERRORINTERNAL_RESPONSE,
-            responseMessage: 'Internal server error, please try again!'
-        })
-    }
-}
-
 
 exports.loginAccount = function (data) {
     return new Promise(async function (resolve, reject) {
@@ -210,39 +168,6 @@ exports.loginAccount = function (data) {
             let cd = await checkDataAccount(data);
             console.log('checkDataAccount =>', cd)
             resolve(cd);
-
-        } catch (e) {
-            console.log('Error login Ultipage ==> ', e);
-            resolve({
-                responseCode: process.env.ERRORINTERNAL_RESPONSE,
-                responseMessage: "Internal server error, please try again!"
-            })
-        }
-    })
-}
-
-exports.getAccount = function (d) {
-    return new Promise(async function (resolve, reject) {
-        try {
-            var data = d.param
-            if (!data.phone) {
-                resolve({
-                    responseCode: process.env.NOTACCEPT_RESPONSE,
-                    responseMessage: "Phone required"
-                })
-                return;
-            }
-
-
-            // check account data ultipage first
-            let cd = await checkDataAccount(data);
-            console.log('checkDataAccount =>', cd)
-            if (cd.responseCode == process.env.SUCCESS_RESPONSE) {
-                // next step update OTP
-                resolve(cd);
-            } else {
-                resolve(cd);
-            }
 
         } catch (e) {
             console.log('Error login Ultipage ==> ', e);
@@ -410,14 +335,10 @@ async function generateToken(data) {
         })
     }
 }
-exports.checkToken = function (data) {
+exports.checkToken = function (token) {
     return new Promise(async function (resolve, reject) {
         try {
-            // console.log('DATAAAAAAAA => ', data)
-            // let ut = await unwrapToken(data);
-            // console.log('TOKEN JWT => ', ut)
-            // let un = await unWrap(ut);
-            let un = await unWrap(data);
+            let un = await unWrap(token);
             console.log('UN => ', un)
             if (un == process.env.UNAUTHORIZED_RESPONSE) {
                 console.log('Check token has been expired!')
@@ -434,16 +355,8 @@ exports.checkToken = function (data) {
                 }
                 resolve(message);
             } else {
-                // message = {
-                //     "responseCode": process.env.SUCCESS_RESPONSE,
-                //     "responseMessage": "Your data token",
-                //     "data": un
-                // }
-                // resolve(message);
-
-                let ct = await checkValidToken(data);
+                let ct = await checkValidToken(token);
                 if (ct.responseCode == process.env.SUCCESS_RESPONSE) {
-                    console.log('Success check token')
                     message = {
                         "responseCode": process.env.SUCCESS_RESPONSE,
                         "responseMessage": "Your data token",
@@ -491,7 +404,7 @@ async function unWrap(data) {
         }
     }
 }
-async function checkValidToken(data) {
+async function checkValidToken(token) {
     let res = {};
     try {
         mongoose.Promise = global.Promise;
@@ -499,7 +412,7 @@ async function checkValidToken(data) {
             useNewUrlParser: true
         });
         let query = await accountSchema.findOne({
-            "token": data
+            "token": token
         });
         console.log('query =>',query)
         await mongoose.connection.close();

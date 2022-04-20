@@ -23,10 +23,6 @@ const accountSchema = new Schema({
         type: String,
         required: false
     },
-    language: {
-        type: String,
-        required: false
-    },
     deviceId: {
         type: String,
         required: false
@@ -42,11 +38,7 @@ const accountSchema = new Schema({
     createdAt: {
         type: String,
         required: false
-    },
-    createdTime: {
-        type: Number,
-        required: false
-    },
+    }
 });
 const account = mongoose.model('accounts', accountSchema);
 module.exports = account;
