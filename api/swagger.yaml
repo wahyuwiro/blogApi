@@ -33,11 +33,11 @@
           - "application/xml"
           - "application/json"
         parameters:
-          - name: "appId"
+          - name: "signature"
             in: "header"
             required: false
             type: "string"
-            description: "id of app"
+            description: "signature of app"
           - in: "body"
             name: "body"
             required: true

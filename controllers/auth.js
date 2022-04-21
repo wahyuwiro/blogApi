@@ -43,9 +43,9 @@ module.exports.logoutAccount = async function logoutAccount(req, res) {
 }
 
 module.exports.registerAccount = async function registerAccount(req, res) {
-    var appId = req.swagger.params['appId'].value;
+    var signature = req.swagger.params['signature'].value;
     var body = req.swagger.params['body'].value;
-    body.appId = appId;
+    body.signature = signature;
 
     let response = await authService.registerAccount(body);    
     console.log('RESPONSE REGISTER ACCOUNT ===> ', response)

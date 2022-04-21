@@ -30,15 +30,16 @@ function registerAccount(data) {
             await mongoose.connect(mongo.mongoDb.url, {
                 useNewUrlParser: true
             });
-            
-            var newAccount = new accountSchema({
-                fullname: data.fullname,
-                email: data.email,
-                phone: data.phone,
+            var objData = {
                 password: password,
-                originPassword: data.password,
-                createdAt: convertDate
-            });
+                createdAt: convertDate                
+            }
+            if(data.fullname) objData.fullname = data.fullname;
+            if(data.email) objData.email = data.email;
+            if(data.phone) objData.phone = data.phone;
+            if(data.originPassword) objData.originPassword = data.originPassword;
+            if(data.fullname) objData.fullname = data.fullname;
+            var newAccount = new accountSchema(objData);            
             var saveAcc = await newAccount.save();
             console.log('saveAcc ==> ', saveAcc)
             await mongoose.connection.close();
