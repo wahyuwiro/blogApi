@@ -48,6 +48,35 @@ module.exports.insertBlog = async function insertBlog(req, res) {
     }    
 }
 
+module.exports.updateBlog = async function updateBlog(req, res) {
+    var token = req.swagger.params['token'].value;
+    var body = req.swagger.params['body'].value;
+    // check token 
+    let ct = await auth.checkToken(token);
+    if (ct.responseCode == process.env.SUCCESS_RESPONSE) {
+        // var data = JSON.stringify(ct.data);
+        body.profile = ct.data;
+        let response = await master.updateBlog(body);
+        utils.writeJson(res, response);
+    } else {
+        utils.writeJson(res, ct);
+    }    
+}
+
+module.exports.deleteBlog = async function deleteBlog(req, res) {
+    var token = req.swagger.params['token'].value;
+    var body = req.swagger.params['body'].value;
+    // check token 
+    let ct = await auth.checkToken(token);
+    if (ct.responseCode == process.env.SUCCESS_RESPONSE) {
+        // var data = JSON.stringify(ct.data);
+        body.profile = ct.data;
+        let response = await master.deleteBlog(body);
+        utils.writeJson(res, response);
+    } else {
+        utils.writeJson(res, ct);
+    }    
+}
 module.exports.getBlog = async function getBlog(req, res) {
     var token = req.swagger.params['token'].value;
     var param = req.swagger.params['param'].value;

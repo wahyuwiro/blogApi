@@ -363,45 +363,27 @@ function extend(target) {
 
 exports.insertBlog = function (data) {
     return new Promise(async function (resolve, reject) {
-        try {
-            let ib = await insertBlog(data);
-            resolve(ib);
-        } catch (e) {
-            console.log('Error insertBlog => ', e)
-            message = {
-                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
-                "responseMessage": "Internal server error. Try again later!"
-            }
-            resolve(message);
-        }
-    })
-}
-
-function insertBlog(data) {
-    console.log('insertBlog data =>',data)
-    return new Promise(async function (resolve, reject) {
         var res = {};
         try {
             var priorDate = new Date();
             var expDay = priorDate.getDate();
             var expMonth = priorDate.getMonth() + 1;
             var expYear = priorDate.getFullYear();
-            let tmpMonth = ("0" + expMonth).slice(-2); //convert bulan supaya selalu 2 digits
-            let tmpDate = ("0" + expDay).slice(-2); //convert hari supaya selalu 2 digits
+            let tmpMonth = ("0" + expMonth).slice(-2); //convert 2 digits
+            let tmpDate = ("0" + expDay).slice(-2); //convert 2 digits
             var convertDate = expYear + "-" + tmpMonth + "-" + tmpDate;
             await mongoose.connect(mongo.mongoDb.url, {
                 useNewUrlParser: true
             });
-            
-            var newBlog = new blogSchema({
-                title: data.title,
-                content: data.content,
-                phone: data.phone,
+            var objData = {
                 createdUser: data.profile.id,
-                createdAt: convertDate
-            });
+                createdAt: convertDate                
+            }
+            if(data.title) objData.title = data.title;
+            if(data.content) objData.content = data.content;
+            if(data.status) objData.status = data.status;
+            var newBlog = new blogSchema(objData);
             var saveBlog = await newBlog.save();
-            console.log('saveBlog ==> ', saveBlog)
             await mongoose.connection.close();
             if (saveBlog) {
                 res.responseCode= process.env.SUCCESS_RESPONSE,
@@ -410,12 +392,14 @@ function insertBlog(data) {
                 res.responseCode= process.env.NOTACCEPT_RESPONSE,
                 res.responseMessage= 'Failed'
             }           
-            resolve(res);
+            resolve(res);            
         } catch (e) {
-            console.log('Error save blog ==> ', e);
-            res.responseCode = process.env.ERRORINTERNAL_RESPONSE,
-            res.responseMessage = 'Internal server error, please try again!'
-            resolve(res);
+            console.log('Error insertBlog => ', e)
+            message = {
+                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
+                "responseMessage": "Internal server error. Try again later!"
+            }
+            resolve(message);
         }
     })
 }
@@ -471,6 +455,133 @@ function getBlog(data) {
             res.responseCode = process.env.ERRORINTERNAL_RESPONSE,
             res.responseMessage = 'Internal server error, please try again!'
             resolve(res);
+        }
+    })
+}
+
+exports.updateBlog = function (data) {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let ub = await updateBlog(data);
+            resolve(ub);
+        } catch (e) {
+            console.log('Error insertBlog => ', e)
+            message = {
+                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
+                "responseMessage": "Internal server error. Try again later!"
+            }
+            resolve(message);
+        }
+    })
+}
+
+function updateBlog(data) {
+    console.log('updateBlog data =>',data)
+    return new Promise(async function (resolve, reject) {
+        var res = {}, vTitle = {}, vContent = {}, vStatus = {}, viView = {}, viComment = {};
+        try {
+            if (data.id) {
+            } else {
+                return resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "Notaccepted"
+                })
+            }
+
+            if (data.title) {
+                vTitle = {
+                  'title': data.title
+                }
+            }
+            if (data.content) {
+                vContent = {
+                  'content': data.content
+                }
+            }
+            if (data.status) {
+                vStatus = {
+                  'status': data.status
+                }
+            }
+            if (data.iView) {
+                viView = {
+                  'iView': data.iView
+                }
+            }
+            if (data.iComment) {
+                viComment = {
+                  'iComment': data.iComment
+                }
+            }
+            var value = extend({}, vTitle, vContent, vStatus, viView, viView);
+            await mongoose.connect(mongo.mongoDb.url, {
+                useNewUrlParser: true
+            });            
+            let query = await blogSchema.findOneAndUpdate({
+                "_id": data.id
+            }, {
+                $set: value
+            }, {
+                useFindAndModify: false
+            });
+      
+
+            await mongoose.connection.close();
+            if (query) {
+                res.responseCode = process.env.SUCCESS_RESPONSE;
+                res.responseMessage = "Blog updated";
+            } else {
+                res.responseCode = process.env.FAILED_RESPONSE;
+                res.responseMessage = "Failed blog update";
+            }
+      
+            resolve(res);
+        } catch (e) {
+            console.log('Error update blog ==> ', e);
+            res.responseCode = process.env.ERRORINTERNAL_RESPONSE,
+            res.responseMessage = 'Internal server error, please try again!'
+            resolve(res);
+        }
+    })
+}
+exports.deleteBlog = function (data) {
+    console.log('deleteBlog data =>',data)
+    return new Promise(async function (resolve, reject) {
+        var res = {};
+        try {
+            if (data.id) {
+            } else {
+                return resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "Notaccepted"
+                })
+            }
+            await mongoose.connect(mongo.mongoDb.url, {
+                useNewUrlParser: true
+            });            
+            let query = await blogSchema.deleteOne({
+                "_id": data.id
+            });
+            console.log('query =>',query)
+        
+
+            await mongoose.connection.close();
+            if (query.deletedCount > 0) {
+                res.responseCode = process.env.SUCCESS_RESPONSE;
+                res.responseMessage = "Blog deleted";
+            } else {
+                res.responseCode = process.env.FAILED_RESPONSE;
+                res.responseMessage = "Failed blog delete";
+            }
+      
+            resolve(res);
+        } catch (e) {
+            console.log('Error deleteBlog => ', e)
+            message = {
+                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
+                "responseMessage": "Internal server error. Try again later!"
+            }
+            resolve(message);
         }
     })
 }

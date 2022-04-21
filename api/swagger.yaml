@@ -229,7 +229,7 @@
             description: "Access entry"
             required: false
             type: "string"
-          - name: "appSignature"
+          - name: "signature"
             in: "header"
             description: "Signature of app"
             required: false

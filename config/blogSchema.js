@@ -11,6 +11,10 @@ const blogSchema = new Schema({
         type: String,
         required: false
     },
+    status: {
+        type: String,
+        required: false
+    },
     iView: {
         type: Number,
         default: 0

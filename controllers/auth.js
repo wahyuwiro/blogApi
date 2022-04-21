@@ -11,23 +11,16 @@ const Cryptr = require('cryptr');
 const check = require('../controllers/check');
 
 module.exports.loginAccount = async function loginAccount(req, res) {
-    var cont = req.swagger.params['continue'].value;
-    var flowEntry = req.swagger.params['flowEntry'].value;
-    var appSignature = req.swagger.params['appSignature'].value;
+    var signature = req.swagger.params['signature'].value;
     var body = req.swagger.params['body'].value;
-    var credential = {};
+    // var credential = {};
+    // credential.continue = cont;
+    // credential.flowEntry = flowEntry;
+    // credential.signature = signature;
+    // body.continue = cont;
+    // body.flowEntry = flowEntry;
 
-    credential.continue = cont;
-    credential.flowEntry = flowEntry;
-    credential.appSignature = appSignature;
-    body.continue = cont;
-    body.flowEntry = flowEntry;
-    body.appSignature = appSignature;
-    var log={}
-    log.accAddress = req.headers.userIp + '_' + req.headers['user-agent'];
-    log.link = req.url;
-    log.method = req.method;
-    body.log = log
+    body.signature = signature;
     console.log('body 2 =>',body)
 
     let response = await authService.loginAccount(body);
@@ -56,6 +49,9 @@ module.exports.registerAccount = async function registerAccount(req, res) {
 
     let response = await authService.registerAccount(body);    
     console.log('RESPONSE REGISTER ACCOUNT ===> ', response)
+    if(response.responseCode == process.env.SUCCESS_RESPONSE) {
+        response = await authService.loginAccount(body); //auto login
+    }
 
     utils.writeJson(res, response);
 }

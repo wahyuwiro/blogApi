@@ -22,11 +22,11 @@ function registerAccount(data) {
             var expDay = priorDate.getDate();
             var expMonth = priorDate.getMonth() + 1;
             var expYear = priorDate.getFullYear();
-            let tmpMonth = ("0" + expMonth).slice(-2); //convert bulan supaya selalu 2 digits
-            let tmpDate = ("0" + expDay).slice(-2); //convert hari supaya selalu 2 digits
+            let tmpMonth = ("0" + expMonth).slice(-2); //convert 2 digits
+            let tmpDate = ("0" + expDay).slice(-2); //convert 2 digits
             var convertDate = expYear + "-" + tmpMonth + "-" + tmpDate;
             var dateObj = new Date().getTime();
-            const password = await argon2.hash(data.phone + ':' + data.password);
+            const password = await argon2.hash(data.email + ':' + data.password);
             await mongoose.connect(mongo.mongoDb.url, {
                 useNewUrlParser: true
             });
@@ -112,10 +112,10 @@ exports.registerAccount = function (body) {
     return new Promise(async function (resolve, reject) {
         try {
             console.log('body =>', body)
-            if (!body.phone) {
+            if (!body.email) {
                 message = {
                     "responseCode": process.env.NOTACCEPT_RESPONSE,
-                    "responseMessage": "Phone required"
+                    "responseMessage": "Email required"
                 }
                 resolve(message);
             }
@@ -158,10 +158,17 @@ exports.registerAccount = function (body) {
 exports.loginAccount = function (data) {
     return new Promise(async function (resolve, reject) {
         try {
-            if (!data.phone) {
+            if (!data.email) {
                 resolve({
                     responseCode: process.env.NOTACCEPT_RESPONSE,
-                    responseMessage: "Phone required"
+                    responseMessage: "email is required"
+                })
+                return;
+            }
+            if (!data.password) {
+                resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "password is required"
                 })
                 return;
             }
@@ -187,19 +194,19 @@ async function checkDataAccount(data) {
             useNewUrlParser: true
         });
         let query = await accountSchema.findOne({
-            "phone": data.phone
+            "email": data.email
         }, {fullname: 1, email: 1, phone: 1, password: 1, _id: 1 });
         console.log('query =>',query)
         await mongoose.connection.close();
         if (query === null) {            
             res = {
                 responseCode: process.env.NOTACCEPT_RESPONSE,
-                responseMessage: "Not found"
+                responseMessage: "Data not found"
             }
         } else {
             if(data.password) {
                 resData = query;
-                let password = data.phone + ":" + data.password;
+                let password = data.email + ":" + data.password;
                 console.log('password =>',password)
                 console.log('query =>',query)
                 let check = await argon2.verify(query.password, password);
@@ -228,7 +235,7 @@ async function checkDataAccount(data) {
                 }else{
                     res = {
                         responseCode: process.env.NOTACCEPT_RESPONSE,
-                        responseMessage: "Not found"
+                        responseMessage: "Data not found"
                     }    
                 }
             }else{      
