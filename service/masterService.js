@@ -407,8 +407,8 @@ exports.insertBlog = function (data) {
 exports.getBlog = function (data) {
     return new Promise(async function (resolve, reject) {
         try {
-            let ib = await getBlog(data);
-            resolve(ib);
+            let gb = await getBlog(data);
+            resolve(gb);
         } catch (e) {
             console.log('Error getBlog => ', e)
             message = {
@@ -582,6 +582,57 @@ exports.deleteBlog = function (data) {
                 "responseMessage": "Internal server error. Try again later!"
             }
             resolve(message);
+        }
+    })
+}
+exports.getArticle = function (data) {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let gb = await getArticle(data);
+            resolve(gb);
+        } catch (e) {
+            console.log('Error getArticle => ', e)
+            message = {
+                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
+                "responseMessage": "Internal server error. Try again later!"
+            }
+            resolve(message);
+        }
+    })
+}
+
+function getArticle(data) {
+    console.log('getArticle data =>',data)
+    return new Promise(async function (resolve, reject) {
+        var res = {}, pId = {}, pUser = {};
+        try {
+            if (data.id) {
+                pId = {
+                  '_id': data.id
+                }
+            }
+            var param = extend({}, pId, pUser);
+            await mongoose.connect(mongo.mongoDb.url, {
+                useNewUrlParser: true
+            });
+            let query = await blogSchema.find(param).sort({'createdDate': -1}).populate('createdUser','fullname');
+            console.log('query ==> ', query)
+            await mongoose.connection.close();
+            if (query === null || query.length == 0) {
+                res.responseCode = process.env.NOTFOUND_RESPONSE;
+                res.responseMessage = "Not found"
+            } else {
+                res.responseCode = process.env.SUCCESS_RESPONSE;
+                res.responseMessage = "Success";
+                res.data = query
+            }    
+            
+            resolve(res);
+        } catch (e) {
+            console.log('Error get blog ==> ', e);
+            res.responseCode = process.env.ERRORINTERNAL_RESPONSE,
+            res.responseMessage = 'Internal server error, please try again!'
+            resolve(res);
         }
     })
 }

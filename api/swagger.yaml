@@ -379,6 +379,64 @@
                   description: unauthorize.
         x-swagger-router-controller: "auth"
 
+    /article:
+      get:
+        tags:
+          - "Blog"
+        summary: "Get article"
+        description: "Get article"
+        operationId: "getArticle"
+        produces:
+          - "application/xml"
+          - "application/json"
+        parameters:
+          - name: "signature"
+            in: "header"
+            description: "signature of device"
+            required: false
+            type: "string"
+          - name: "param"
+            in: "header"
+            description: "param of get"
+            required: false
+            type: "string"
+
+        responses:
+          "200":
+            description: "Blog get response"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: text description.
+          "401":
+            description: "Invalidunauthorize"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: unauthorize.
+          "500":
+            description: "Internal server error"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: unauthorize.
+        x-swagger-router-controller: "master"
+
     /blog:
       get:
         tags:
@@ -561,6 +619,10 @@
             required: true
             type: "string"
             description: "token of app"
+          - name: "param"
+            in: "header"
+            required: false
+            type: "string"
           - in: "body"
             name: "body"
             required: true

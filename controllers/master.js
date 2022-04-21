@@ -65,7 +65,9 @@ module.exports.updateBlog = async function updateBlog(req, res) {
 
 module.exports.deleteBlog = async function deleteBlog(req, res) {
     var token = req.swagger.params['token'].value;
+    var param = req.swagger.params['param'].value;
     var body = req.swagger.params['body'].value;
+    if(param) body = JSON.parse(param)
     // check token 
     let ct = await auth.checkToken(token);
     if (ct.responseCode == process.env.SUCCESS_RESPONSE) {
@@ -93,4 +95,15 @@ module.exports.getBlog = async function getBlog(req, res) {
     } else {
         utils.writeJson(res, ct);
     }    
+}
+module.exports.getArticle = async function getArticle(req, res) {
+    var signature = req.swagger.params['signature'].value;
+    var param = req.swagger.params['param'].value;
+    if(!param) { param = {}
+    }else{ param = JSON.parse(param)
+    }
+    // check signature 
+    let response = await master.getArticle(param);
+    utils.writeJson(res, response);
+
 }
