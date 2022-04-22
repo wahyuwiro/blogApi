@@ -4,6 +4,8 @@ var mongoose = require('mongoose').set('debug', true);
 var mongo = require('../config/mongo');
 var accountSchema = require('../config/accountSchema');
 var blogSchema = require('../config/blogSchema');
+var blogViewSchema = require('../config/blogViewSchema');
+var blogCommentSchema = require('../config/blogCommentSchema');
 // const pgCon = require('../config/pgConfig');
 let message = {};
 const fs = require('fs');
@@ -513,7 +515,7 @@ function updateBlog(data) {
                   'iComment': data.iComment
                 }
             }
-            var value = extend({}, vTitle, vContent, vStatus, viView, viView);
+            var value = extend({}, vTitle, vContent, vStatus, viView, viComment);
             await mongoose.connect(mongo.mongoDb.url, {
                 useNewUrlParser: true
             });            
@@ -604,18 +606,200 @@ exports.getArticle = function (data) {
 function getArticle(data) {
     console.log('getArticle data =>',data)
     return new Promise(async function (resolve, reject) {
-        var res = {}, pId = {}, pUser = {};
+        var res = {}, pId = {};
+        try {
+            if (data.id) {
+                pId = {
+                  '_id': data.id
+                }
+
+                //insert log view
+                var priorDate = new Date();
+                var expDay = priorDate.getDate();
+                var expMonth = priorDate.getMonth() + 1;
+                var expYear = priorDate.getFullYear();
+                let tmpMonth = ("0" + expMonth).slice(-2); //convert 2 digits
+                let tmpDate = ("0" + expDay).slice(-2); //convert 2 digits
+                var convertDate = expYear + "-" + tmpMonth + "-" + tmpDate;
+                var objData = {
+                    blogId: data.id,
+                    createdAt: convertDate                
+                }
+                var logView = new blogViewSchema(objData);
+                var saveLog = await logView.save();
+                var mongodb = require('mongodb');
+                var objId = new mongodb.ObjectID(data.id);
+                await mongoose.connect(mongo.mongoDb.url, {
+                    useNewUrlParser: true
+                });    
+                var c = await blogViewSchema.aggregate( [
+                    { $match: {"blogId": objId } },
+                    { $group: { 
+                        _id: "$blogId", 
+                        count: { $sum: 1 }} 
+                    },
+                    { $project: { _id: 0 } }
+                ] );
+                await mongoose.connection.close();
+
+                if(c.length > 0) {
+                    var iView = c[0].count
+                    var ub = await updateBlog({id: data.id, iView: iView})
+                    console.log('updateBlog =>',ub)
+                }
+            }
+
+            var param = extend({}, pId);
+            await mongoose.connect(mongo.mongoDb.url, {
+                useNewUrlParser: true
+            });
+            let query = await blogSchema.find(param).sort({'createdDate': -1}).populate('createdUser','fullname');
+            await mongoose.connection.close();
+            console.log('query ==> ', query)
+
+            if (query === null || query.length == 0) {
+                res.responseCode = process.env.NOTFOUND_RESPONSE;
+                res.responseMessage = "Not found"
+            } else {
+                res.responseCode = process.env.SUCCESS_RESPONSE;
+                res.responseMessage = "Success";
+                res.data = query
+            }    
+            
+            resolve(res);
+        } catch (e) {
+            console.log('Error get blog ==> ', e);
+            res.responseCode = process.env.ERRORINTERNAL_RESPONSE,
+            res.responseMessage = 'Internal server error, please try again!'
+            resolve(res);
+        }
+    })
+}
+exports.insertBlogComment = function (data) {
+    return new Promise(async function (resolve, reject) {
+        var res = {};
+        try {
+            if (!data.blogId) {
+                return resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "blogId is required"
+                })
+            }
+            if (!data.name) {
+                return resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "name is required"
+                })
+            }
+            if (!data.email) {
+                return resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "email is required"
+                })
+            }
+            if (!data.comment) {
+                return resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "comment is required"
+                })
+            }
+
+            var priorDate = new Date();
+            var expDay = priorDate.getDate();
+            var expMonth = priorDate.getMonth() + 1;
+            var expYear = priorDate.getFullYear();
+            let tmpMonth = ("0" + expMonth).slice(-2); //convert 2 digits
+            let tmpDate = ("0" + expDay).slice(-2); //convert 2 digits
+            var convertDate = expYear + "-" + tmpMonth + "-" + tmpDate;
+            await mongoose.connect(mongo.mongoDb.url, {
+                useNewUrlParser: true
+            });
+            var objData = {
+                blogId: data.blogId,
+                createdAt: convertDate                
+            }
+            if(data.name) objData.name = data.name;
+            if(data.email) objData.email = data.email;
+            if(data.comment) objData.comment = data.comment;
+            var newBlogComment = new blogCommentSchema(objData);
+            var saveBlogComment = await newBlogComment.save();
+            await mongoose.connection.close();
+            if (saveBlogComment) {
+                var mongodb = require('mongodb');
+                var objId = new mongodb.ObjectID(data.blogId);
+                await mongoose.connect(mongo.mongoDb.url, {
+                    useNewUrlParser: true
+                });    
+                var c = await blogCommentSchema.aggregate( [
+                    { $match: {"blogId": objId } },
+                    { $group: { 
+                        _id: "$blogId", 
+                        count: { $sum: 1 }} 
+                    },
+                    { $project: { _id: 0 } }
+                ] );
+                await mongoose.connection.close();
+                console.log('iComment =>',c)
+
+                if(c.length > 0) {
+                    var iComment = c[0].count
+                    var ub = await updateBlog({id: data.blogId, iComment: iComment})
+                    console.log('updateBlog =>',ub)
+                }
+
+                res.responseCode= process.env.SUCCESS_RESPONSE,
+                res.responseMessage= 'Success'
+            } else {
+                res.responseCode= process.env.NOTACCEPT_RESPONSE,
+                res.responseMessage= 'Failed'
+            }           
+            resolve(res);            
+        } catch (e) {
+            console.log('Error insertBlog => ', e)
+            message = {
+                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
+                "responseMessage": "Internal server error. Try again later!"
+            }
+            resolve(message);
+        }
+    })
+}
+exports.getBlogComment = function (data) {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let gb = await getBlogComment(data);
+            resolve(gb);
+        } catch (e) {
+            console.log('Error getBlogComment => ', e)
+            message = {
+                "responseCode": process.env.ERRORINTERNAL_RESPONSE,
+                "responseMessage": "Internal server error. Try again later!"
+            }
+            resolve(message);
+        }
+    })
+}
+
+function getBlogComment(data) {
+    console.log('getBlogComment data =>',data)
+    return new Promise(async function (resolve, reject) {
+        var res = {}, pId = {}, pBlogId = {}, pUser = {};
         try {
             if (data.id) {
                 pId = {
                   '_id': data.id
                 }
             }
+            if (data.blogId) {
+                pId = {
+                  'blogId': data.blogId
+                }
+            }            
             var param = extend({}, pId, pUser);
             await mongoose.connect(mongo.mongoDb.url, {
                 useNewUrlParser: true
             });
-            let query = await blogSchema.find(param).sort({'createdDate': -1}).populate('createdUser','fullname');
+            let query = await blogCommentSchema.find(param).sort({'createdDate': -1});
             console.log('query ==> ', query)
             await mongoose.connection.close();
             if (query === null || query.length == 0) {

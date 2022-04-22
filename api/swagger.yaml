@@ -664,6 +664,119 @@
                   description: unauthorize.
         x-swagger-router-controller: "master"
 
+    /blogComment:
+      get:
+        tags:
+          - "Blog"
+        summary: "Get blog Ccmment"
+        description: "Get Blog Comment"
+        operationId: "getBlogComment"
+        produces:
+          - "application/xml"
+          - "application/json"
+        parameters:
+          - name: "signature"
+            in: "header"
+            description: "signature of device"
+            required: false
+            type: "string"
+          - name: "param"
+            in: "header"
+            description: "param of get"
+            required: false
+            type: "string"
+
+        responses:
+          "200":
+            description: "Blog get response"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: text description.
+          "401":
+            description: "Invalidunauthorize"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: unauthorize.
+          "500":
+            description: "Internal server error"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: unauthorize.
+        x-swagger-router-controller: "master"      
+      post:
+        tags:
+          - "Blog"
+        summary: "Insert blog comment"
+        description: "Insert blog comment"
+        operationId: "insertBlogComment"
+        produces:
+          - "application/xml"
+          - "application/json"
+        parameters:
+          - name: "signature"
+            in: "header"
+            required: false
+            type: "string"
+            description: "signature of app"
+          - in: "body"
+            name: "body"
+            required: true
+            schema:
+              $ref: "#/definitions/insertBlog"
+        responses:
+          "200":
+            description: "Blog post response"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: text description.
+          "401":
+            description: "Invalidunauthorize"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: unauthorize.
+          "500":
+            description: "Internal server error"
+            schema:
+              type: object
+              properties:
+                responseCode:
+                  type: integer
+                  description: code of response.
+                responseText:
+                  type: string
+                  description: unauthorize.
+        x-swagger-router-controller: "master"
+
   definitions:
     registerAccount:
       type: "object"
