@@ -33,12 +33,7 @@ module.exports.logoutAccount = async function logoutAccount(req, res) {
     let body = {};
     body.token = token;
 
-    // let response = await authService.logoutAccount(body);
-    let response = {
-        "responseCode": process.env.SUCCESS_RESPONSE,
-        "responseMessage": "Success"
-    }
-    console.log('RESPONSE LOGOUT ACCOUNT ===> ', response)
+    let response = await authService.logoutAccount(body);
     utils.writeJson(res, response);
 }
 

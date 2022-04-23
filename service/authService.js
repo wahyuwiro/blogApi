@@ -63,7 +63,7 @@ function registerAccount(data) {
 async function checkExistAccount(data) {
     let res = {};
     try {
-        // open connection for find data by phone in ultipage
+        // open connection for find data by phone
         mongoose.Promise = global.Promise;
         await mongoose.connect(mongo.mongoDb.url, {
             useNewUrlParser: true
@@ -72,7 +72,7 @@ async function checkExistAccount(data) {
             "phone": data.phone
         });
         await mongoose.connection.close();
-        // close connection for find data by phone in ultipage
+        // close connection for find data by phone
         if (query === null) {
             mongoose.Promise = global.Promise;
             await mongoose.connect(mongo.mongoDb.url, {
@@ -98,7 +98,7 @@ async function checkExistAccount(data) {
             return res;
         }
     } catch (e) {
-        console.log('Error check account on ultipage ==> ', e);
+        console.log('Error check account ==> ', e);
         res.responseCode = process.env.ERRORINTERNAL_RESPONSE;
         res.responseMessage = 'Internal server error, please try again!';
         return (res);
@@ -178,7 +178,7 @@ exports.loginAccount = function (data) {
             resolve(cd);
 
         } catch (e) {
-            console.log('Error login Ultipage ==> ', e);
+            console.log('Error login ==> ', e);
             resolve({
                 responseCode: process.env.ERRORINTERNAL_RESPONSE,
                 responseMessage: "Internal server error, please try again!"
@@ -437,4 +437,48 @@ async function checkValidToken(token) {
         res.responseCode = process.env.ERRORINTERNAL_RESPONSE;
         res.responseMessage = "Internal server error";
     }
+}
+exports.logoutAccount = function (data) {
+    return new Promise(async function (resolve, reject) {
+        try {
+            let sorting = {
+                "createdDate": "-1"
+            };
+            if (!data.token) {
+                resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "token is required"
+                })
+                return;
+            }
+            mongoose.Promise = global.Promise;
+            await mongoose.connect(mongo.mongoDb.url);
+            let tc = await accountSchema.findOneAndUpdate({token: data.token}, {
+                $set: {token : ''}
+            }, {
+                new: true,
+                sort: sorting
+            });
+            await mongoose.connection.close();
+            if (tc) {
+                return resolve({
+                    responseCode: process.env.SUCCESS_RESPONSE,
+                    responseMessage: "Success",
+                    data: tc
+                })
+            } else {
+                return resolve({
+                    responseCode: process.env.NOTACCEPT_RESPONSE,
+                    responseMessage: "Failed"
+                })
+            }            
+
+        } catch (e) {
+            console.log('Error logoutAccounte ==> ', e);
+            resolve({
+                responseCode: process.env.ERRORINTERNAL_RESPONSE,
+                responseMessage: "Internal server error, please try again!"
+            })
+        }
+    })
 }

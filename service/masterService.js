@@ -42,7 +42,7 @@ exports.getProfile = function (data) {
 async function getProfileAccount(data) {
     console.log('getProfileAccount data=>', data)
     try {
-        // open connection for find data by phone in ultipage
+        // open connection for find data by phone 
         mongoose.Promise = global.Promise;
         await mongoose.connect(mongo.mongoDb.url, {
             useNewUrlParser: true
@@ -51,7 +51,7 @@ async function getProfileAccount(data) {
             "email": data.email
         });
         await mongoose.connection.close();
-        // close connection for find data by phone in ultipage
+        // close connection for find data by phone
         if (query === null) {
             return ({
                 responseCode: process.env.NOTFOUND_RESPONSE,
@@ -396,10 +396,10 @@ exports.insertBlog = function (data) {
             }           
             resolve(res);            
         } catch (e) {
-            console.log('Error insertBlog => ', e)
+            console.log('Error insertBlog sercive => ', e)
             message = {
                 "responseCode": process.env.ERRORINTERNAL_RESPONSE,
-                "responseMessage": "Internal server error. Try again later!"
+                "responseMessage": "Internal server error.\n " + e
             }
             resolve(message);
         }
@@ -467,7 +467,7 @@ exports.updateBlog = function (data) {
             let ub = await updateBlog(data);
             resolve(ub);
         } catch (e) {
-            console.log('Error insertBlog => ', e)
+            console.log('Error updateBlog => ', e)
             message = {
                 "responseCode": process.env.ERRORINTERNAL_RESPONSE,
                 "responseMessage": "Internal server error. Try again later!"
@@ -625,13 +625,14 @@ function getArticle(data) {
                     blogId: data.id,
                     createdAt: convertDate                
                 }
-                var logView = new blogViewSchema(objData);
-                var saveLog = await logView.save();
-                var mongodb = require('mongodb');
-                var objId = new mongodb.ObjectID(data.id);
                 await mongoose.connect(mongo.mongoDb.url, {
                     useNewUrlParser: true
                 });    
+                var logView = new blogViewSchema(objData);
+                var saveLogView = await logView.save();
+                console.log('saveLogView =>',saveLogView)
+                var mongodb = require('mongodb');
+                var objId = new mongodb.ObjectID(data.id);
                 var c = await blogViewSchema.aggregate( [
                     { $match: {"blogId": objId } },
                     { $group: { 
@@ -755,7 +756,7 @@ exports.insertBlogComment = function (data) {
             }           
             resolve(res);            
         } catch (e) {
-            console.log('Error insertBlog => ', e)
+            console.log('Error insertBlogComment => ', e)
             message = {
                 "responseCode": process.env.ERRORINTERNAL_RESPONSE,
                 "responseMessage": "Internal server error. Try again later!"

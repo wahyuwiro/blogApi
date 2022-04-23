@@ -65,10 +65,10 @@ module.exports.insertBlog = async function insertBlog(req, res) {
             utils.writeJson(res, ct);
         }
     } catch (error) {
-        console.log('error insertBlog =>', error);
+        console.log('error insertBlog controller =>', error);
         let message = {
             'responseCode': process.env.ERRORINTERNAL_RESPONSE,
-            'responseMessage': "Internal server error"
+            'responseMessage': "Internal server error" + error
         }
         utils.writeJson(res, message);
     }        
