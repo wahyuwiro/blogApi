@@ -1,3 +1,4 @@
 # blogApi
-# create mongodb name : blog
-# configuration mongo in config/mongo
+Setting:
+* create mongodb name : blog
+* configuration database  in config/mongo
