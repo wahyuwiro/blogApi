@@ -1,0 +1,58 @@
+[{
+  "_id": {
+    "$oid": "625f937a77affb2130f79172"
+  },
+  "fullname": "wahyu",
+  "email": "phawiro@gmail.com",
+  "phone": "085655694807",
+  "password": "$argon2i$v=19$m=4096,t=3,p=1$GOxScyAO82KLtakWiVTgYw$4Zya5+LLxHX5uyZSA1n88goysSwNax+v8lgk3Zi47ww",
+  "originPassword": "123456",
+  "createdAt": "2022-04-20",
+  "createdDate": {
+    "$date": "2022-04-20T05:00:42.076Z"
+  },
+  "__v": 0,
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNWY5MzdhNzdhZmZiMjEzMGY3OTE3MiIsImZ1bGxuYW1lIjoid2FoeXUiLCJlbWFpbCI6InBoYXdpcm9AZ21haWwuY29tIiwicGhvbmUiOiIwODU2NTU2OTQ4MDciLCJpYXQiOjE2NTA2OTYwNTMsImV4cCI6MTY1MDY5OTY1MywiYXVkIjoiR0xPQkFMIiwiaXNzIjoicGhhd2lyb0BnbWFpbC5jb20iLCJzdWIiOiJBY2Nlc3NWYWxpZGF0aW9uIn0.oHUPBXqOR5YHYvOCR1q1ETe--BQF_EDMc4Od3RIF7CnLIISZgHIuT1P-bXv5bp9qRXIO2bflPjaBnk4wVb2hag"
+},{
+  "_id": {
+    "$oid": "62616936ca7ed26060ed4a25"
+  },
+  "password": "$argon2i$v=19$m=4096,t=3,p=1$ssnEMHbK0mbqP2Fc0ZlupQ$DYK08dHdGeoV8I1GK1yNHkVNEWh55rO7UefOIJYfV48",
+  "createdAt": "2022-04-21",
+  "fullname": "Lestari",
+  "email": "phawiro+lestari@gmail.com",
+  "phone": "085655694800",
+  "createdDate": {
+    "$date": "2022-04-21T14:24:54.538Z"
+  },
+  "__v": 0,
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNjE2OTM2Y2E3ZWQyNjA2MGVkNGEyNSIsImZ1bGxuYW1lIjoiTGVzdGFyaSIsImVtYWlsIjoicGhhd2lybytsZXN0YXJpQGdtYWlsLmNvbSIsInBob25lIjoiMDg1NjU1Njk0ODAwIiwiaWF0IjoxNjUwNTU0MTE0LCJleHAiOjE2NTA1NTc3MTQsImF1ZCI6IkdMT0JBTCIsImlzcyI6InBoYXdpcm9AZ21haWwuY29tIiwic3ViIjoiQWNjZXNzVmFsaWRhdGlvbiJ9.YgTkfJEJXDp5kf3MXQSpR_vwz_VcylKYYta1b8bfgwmnMVoRc5lGOZTiy2_H3cg8tl2qTzpvU9Evwq-PB6OYTQ"
+},{
+  "_id": {
+    "$oid": "626342c5d9f3454910057e61"
+  },
+  "password": "$argon2i$v=19$m=4096,t=3,p=1$Bjun9ej9lNxVzPetPH7tpw$veP9HETrun8Dc6vq5HuG4oQXUGFqiYWHCM15z83l5ds",
+  "createdAt": "2022-04-23",
+  "fullname": "Lestari",
+  "email": "phawiro+new@gmail.com",
+  "phone": "085655694801",
+  "createdDate": {
+    "$date": "2022-04-23T00:05:25.142Z"
+  },
+  "__v": 0,
+  "token": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYyNjM0MmM1ZDlmMzQ1NDkxMDA1N2U2MSIsImZ1bGxuYW1lIjoiTGVzdGFyaSIsImVtYWlsIjoicGhhd2lybytuZXdAZ21haWwuY29tIiwicGhvbmUiOiIwODU2NTU2OTQ4MDEiLCJpYXQiOjE2NTA2NzIzMjUsImV4cCI6MTY1MDY3NTkyNSwiYXVkIjoiR0xPQkFMIiwiaXNzIjoicGhhd2lyb0BnbWFpbC5jb20iLCJzdWIiOiJBY2Nlc3NWYWxpZGF0aW9uIn0.vP_7ZUasvNdilfbV4Et-MdrcHPCbppn5puzyhnAgBo-eL_Zvs3VLEjkPpGbZ3MHIIu_tPCQuJujloppU4S_sKg"
+},{
+  "_id": {
+    "$oid": "62635c69e73da5524ca6b5b9"
+  },
+  "password": "$argon2i$v=19$m=4096,t=3,p=1$1QlGAjqwAiS5jIl2Bzvwyg$qQgX12y5gT51G/VPJ+QsQ4Bwq6xxlf7V33t+7eae1Pg",
+  "createdAt": "2022-04-23",
+  "fullname": "Indah",
+  "email": "indah@gmail.com",
+  "phone": "085655694802",
+  "createdDate": {
+    "$date": "2022-04-23T01:54:49.778Z"
+  },
+  "__v": 0,
+  "token": ""
+}]

@@ -440,7 +440,7 @@ function getBlog(data) {
                 useNewUrlParser: true
             });
             let query = await blogSchema.find(param).sort({'createdDate': -1}).populate('createdUser','fullname');
-            console.log('query ==> ', query)
+            // console.log('query ==> ', query)
             await mongoose.connection.close();
             if (query === null || query.length == 0) {
                 res.responseCode = process.env.NOTFOUND_RESPONSE;
@@ -564,8 +564,17 @@ exports.deleteBlog = function (data) {
             let query = await blogSchema.deleteOne({
                 "_id": data.id
             });
+            var mongodb = require('mongodb');
+            var objId = new mongodb.ObjectID(data.id);
+
+            query = await blogViewSchema.deleteMany({
+                "blogId": objId
+            });
+            query = await blogCommentSchema.deleteMany({
+                "blogId": objId
+            });
+
             console.log('query =>',query)
-        
 
             await mongoose.connection.close();
             if (query.deletedCount > 0) {
@@ -654,9 +663,10 @@ function getArticle(data) {
             await mongoose.connect(mongo.mongoDb.url, {
                 useNewUrlParser: true
             });
-            let query = await blogSchema.find(param).sort({'createdDate': -1}).populate('createdUser','fullname');
+            let query = await blogSchema.find(param).sort({'createdDate': -1}).populate('createdUser','fullname').limit(2);
+            if (data.limit == 'no') query = await blogSchema.find(param).sort({'createdDate': -1}).populate('createdUser','fullname'); // no limit
             await mongoose.connection.close();
-            console.log('query ==> ', query)
+            // console.log('query ==> ', query)
 
             if (query === null || query.length == 0) {
                 res.responseCode = process.env.NOTFOUND_RESPONSE;
@@ -801,7 +811,7 @@ function getBlogComment(data) {
                 useNewUrlParser: true
             });
             let query = await blogCommentSchema.find(param).sort({'createdDate': -1});
-            console.log('query ==> ', query)
+            // console.log('query ==> ', query)
             await mongoose.connection.close();
             if (query === null || query.length == 0) {
                 res.responseCode = process.env.NOTFOUND_RESPONSE;

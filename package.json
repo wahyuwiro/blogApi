@@ -4,7 +4,7 @@
   "description": "Service of all source request",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "mocha",
     "prestart": "npm install",
     "start": "nodemon node index.js"
   },
@@ -26,20 +26,23 @@
     "aws-sdk": "^2.908.0",
     "body-parser": "^1.19.0",
     "buffer-image": "^1.0.0",
+    "chai": "^4.3.6",
     "connect": "^3.2.0",
+    "cors": "^2.8.5",
     "crypto": "^1.0.1",
     "cryptr": "^6.0.2",
     "ddos": "^0.2.1",
     "dotenv": "^8.2.0",
     "excel4node": "^1.7.2",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "form-data": "^3.0.0",
     "helmet": "^4.6.0",
     "js-yaml": "^3.14.0",
     "jsonwebtoken": "^8.5.1",
     "md5": "^2.3.0",
+    "mocha": "^9.2.2",
     "moment": "^2.29.1",
-    "mongoose": "^5.12.14",
+    "mongoose": "^5.13.14",
     "node-minify": "^3.6.0",
     "node-rsa": "^1.1.1",
     "nodemon": "^2.0.4",
@@ -47,6 +50,7 @@
     "pg": "^8.5.1",
     "request": "^2.88.0",
     "restana": "^4.7.2",
+    "sinon": "^13.0.2",
     "swagger-tools": "^0.10.4"
   }
 }

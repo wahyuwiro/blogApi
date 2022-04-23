@@ -62,4 +62,33 @@ swaggerTools.initializeMiddleware(swaggerDoc, async function (middleware) {
   }).then(function (e) {
     console.log("MONGO CONNECTED");
   });  
+
+  // Post API to add user to Database
+  app.post("/", async (req, res, next) => {
+    try {
+      const { profileId, name, dob, experience } = req.body;
+      const user = await saveUser({ profileId, name, dob, experience });   
+      res.json({
+        message: "Inserted Successfully",
+        user: user,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });  
+
+  // Get API to get user by his profileId
+  app.get("/:profileId", async (req, res, next) => {
+    try {
+      const { profileId } = req.params;
+      const user = await getUser({ profileId });   
+      res.json({
+        message: "Fetched Successfully",
+        user: user,
+      });
+    } catch (err) {
+      next(err);
+    }
+  });
+
 });
